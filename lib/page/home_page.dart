@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:potterhead_app/characterModel.dart';
@@ -43,6 +44,7 @@ class HomePage extends StatelessWidget {
       );
       characters.add(character);
     }
+    //print(jsonData);
   }
 
   @override
@@ -53,52 +55,72 @@ class HomePage extends StatelessWidget {
         future: fetchCharacters(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return ListView.builder(
-              itemCount: characters.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  margin: const EdgeInsets.only(left: 16, right: 16, top: 8),
-                  elevation: 15,
-                  child: Container(
-                      child: Column(
-                    children: [
-                      Container(
-                        height: 50,
-                        width: 50,
-                        margin: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(15),
-                            topLeft: Radius.circular(15),
+            return Center(
+              child: CarouselSlider.builder(
+                itemCount: characters.length,
+                itemBuilder: (context, index, pageViewIndex) =>
+                    AnimatedContainer(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        blurRadius: 20,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  width: double.infinity,
+                  duration: const Duration(milliseconds: 300),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Container(
+                          clipBehavior: Clip.hardEdge,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20)),
+                          margin: const EdgeInsets.all(10),
+                          height: MediaQuery.of(context).size.width,
+                          child: characters[index].image.isNotEmpty
+                              ? Image.network(
+                                  characters[index].image,
+                                  fit: BoxFit.cover,
+                                )
+                              : const Icon(Icons.error),
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        Text(
+                          characters[index].name,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        Text('(${characters[index].actor})'),
+                        Text(characters[index].house),
+                        GestureDetector(
+                          onTap: () {},
+                          child: const Text(
+                            'More info',
+                            style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue),
                           ),
                         ),
-                        child: characters[index].image.isEmpty
-                            ? Container()
-                            : Image.network(characters[index].image),
-                      ),
-                      Text(characters[index].name),
-                      Text(
-                        characters[index].alternateNames.toList().toString(),
-                      ),
-                      Text(characters[index].gender),
-                      Text(characters[index].house),
-                      Text(characters[index].dateOfBirth),
-                      Text(characters[index].yearOfBirth.toString()),
-                      Text(characters[index].wizard.toString()),
-                      Text(characters[index].ancestry),
-                      Text(characters[index].eyeColour),
-                      Text(characters[index].hairColour),
-                      Text(characters[index].wand.toJson().toString()),
-                      Text(characters[index].patronus),
-                      Text(characters[index].hogwartsStudent.toString()),
-                      Text(characters[index].hogwartsStaff.toString()),
-                      Text(characters[index].actor),
-                      Text(characters[index].species),
-                      Text(characters[index].alive.toString()),
-                    ],
-                  )),
-                );
-              },
+                      ],
+                    ),
+                  ),
+                ),
+                options: CarouselOptions(
+                  autoPlay: false,
+                  height: 500,
+                  aspectRatio: 16 / 9,
+                  viewportFraction: 0.70,
+                  enableInfiniteScroll: false,
+                  enlargeCenterPage: true,
+                ),
+              ),
             );
           } else {
             return const Center(
