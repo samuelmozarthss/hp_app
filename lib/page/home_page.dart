@@ -5,10 +5,20 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:potterhead_app/characterModel.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   List<CharacterModel> characters = [];
+
+  CarouselController _carouselController = CarouselController();
+
+  int _current = 0;
+  dynamic _selectedIndex = {};
 
   Future fetchCharacters() async {
     var response = await http.get(
@@ -51,15 +61,41 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     fetchCharacters();
     return Scaffold(
+      floatingActionButton: _selectedIndex.length > 0
+          ? FloatingActionButton(
+              onPressed: () {},
+              child: const Icon(Icons.arrow_forward_ios),
+            )
+          : null,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        title: const Text(
+          'Hp App',
+          style: TextStyle(
+            color: Colors.black,
+          ),
+        ),
+      ),
       body: FutureBuilder(
         future: fetchCharacters(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             return Center(
               child: CarouselSlider.builder(
+                carouselController: _carouselController,
+                options: CarouselOptions(
+                  autoPlay: false,
+                  height: 500,
+                  aspectRatio: 16 / 9,
+                  viewportFraction: 0.70,
+                  enableInfiniteScroll: false,
+                  enlargeCenterPage: true,
+                ),
                 itemCount: characters.length,
                 itemBuilder: (context, index, pageViewIndex) =>
                     AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     color: Colors.white,
@@ -71,8 +107,7 @@ class HomePage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  width: double.infinity,
-                  duration: const Duration(milliseconds: 300),
+                  width: MediaQuery.of(context).size.width,
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
@@ -99,26 +134,9 @@ class HomePage extends StatelessWidget {
                         ),
                         Text('(${characters[index].actor})'),
                         Text(characters[index].house),
-                        GestureDetector(
-                          onTap: () {},
-                          child: const Text(
-                            'More info',
-                            style: TextStyle(
-                                decoration: TextDecoration.underline,
-                                color: Colors.blue),
-                          ),
-                        ),
                       ],
                     ),
                   ),
-                ),
-                options: CarouselOptions(
-                  autoPlay: false,
-                  height: 500,
-                  aspectRatio: 16 / 9,
-                  viewportFraction: 0.70,
-                  enableInfiniteScroll: false,
-                  enlargeCenterPage: true,
                 ),
               ),
             );
