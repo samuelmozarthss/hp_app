@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:potterhead_app/characterModel.dart';
 
+import 'character_page.dart';
+
 class HomePage extends StatefulWidget {
   HomePage({super.key});
 
@@ -59,24 +61,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    Color textColor;
+
     fetchCharacters();
     return Scaffold(
-      floatingActionButton: _selectedIndex.length > 0
-          ? FloatingActionButton(
-              onPressed: () {},
-              child: const Icon(Icons.arrow_forward_ios),
-            )
-          : null,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: const Text(
-          'Hp App',
-          style: TextStyle(
-            color: Colors.black,
-          ),
-        ),
-      ),
       body: FutureBuilder(
         future: fetchCharacters(),
         builder: (context, snapshot) {
@@ -98,7 +86,7 @@ class _HomePageState extends State<HomePage> {
                   duration: const Duration(milliseconds: 300),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    color: Colors.white,
+                    color: getBgColor(characters[index].house),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.grey.withOpacity(0.2),
@@ -125,7 +113,7 @@ class _HomePageState extends State<HomePage> {
                               : const Icon(Icons.error),
                         ),
                         const SizedBox(
-                          height: 8,
+                          height: 4,
                         ),
                         Text(
                           characters[index].name,
@@ -134,6 +122,28 @@ class _HomePageState extends State<HomePage> {
                         ),
                         Text('(${characters[index].actor})'),
                         Text(characters[index].house),
+                        const SizedBox(
+                          height: 4,
+                        ),
+                        FloatingActionButton(
+                          heroTag: null,
+                          backgroundColor:
+                              getButtonColor(characters[index].house),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CharacterPage(),
+                              ),
+                            );
+                          },
+                          child: const Icon(
+                            Icons.arrow_upward_outlined,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 4,
+                        ),
                       ],
                     ),
                   ),
@@ -148,5 +158,31 @@ class _HomePageState extends State<HomePage> {
         },
       ),
     );
+  }
+}
+
+Color getButtonColor(String house) {
+  switch (house) {
+    case 'Gryffindor':
+      return Colors.red.shade900;
+    case 'Slytherin':
+      return Colors.green.shade900;
+    case 'Hufflepuff':
+      return Colors.yellow.shade900;
+    default:
+      return Colors.blue.shade900;
+  }
+}
+
+Color getBgColor(String house) {
+  switch (house) {
+    case 'Gryffindor':
+      return Colors.red;
+    case 'Slytherin':
+      return Colors.green;
+    case 'Hufflepuff':
+      return Colors.yellow;
+    default:
+      return Colors.blue;
   }
 }
